@@ -141,7 +141,7 @@ with st.sidebar:
 
     sel_years = st.multiselect(
         "Năm", options=[2020,2021,2022,2023,2024],
-        default=[2023,2024]
+        default=[2020,2021,2022,2023,2024]
     )
     sel_branches = st.multiselect(
         "Nhà máy", options=dim_branch['branch_name'].tolist(),
@@ -520,10 +520,10 @@ with tab4:
         fig3.update_layout(height=360, margin=dict(t=40,b=10))
         st.plotly_chart(fig3, use_container_width=True)
 
-    # 4.2 City × Category drill-through (năm cuối cùng)
+    # 4.2 City × Category drill-through (toàn bộ năm được chọn)
     with c4:
-        max_yr = df['year'].max()
-        cross = df[df['year']==max_yr].groupby(['city','category']).agg(
+        year_range = f"{min(sel_years)}–{max(sel_years)}" if len(sel_years) > 1 else str(sel_years[0])
+        cross = df.groupby(['city','category']).agg(
             produced_qty=('produced_qty','sum'),
             scrap_rate_pct=('scrap_rate_pct','mean'),
         ).reset_index()
@@ -531,7 +531,7 @@ with tab4:
         fig4 = px.treemap(cross, path=['city','category'], values='produced_qty',
                           color='scrap_rate_pct',
                           color_continuous_scale='RdYlGn_r',
-                          title=f'4.2 Sản lượng Thành phố × Category ({max_yr})',
+                          title=f'4.2 Sản lượng Thành phố × Category ({year_range})',
                           labels={'scrap_rate_pct':'Scrap %','produced_qty':'Sản lượng'})
         fig4.update_layout(height=360, margin=dict(t=40,b=10))
         st.plotly_chart(fig4, use_container_width=True)
